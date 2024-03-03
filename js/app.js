@@ -8,6 +8,7 @@ class CalorieTracker {
     this._DisplayTotalCalories();
     this._DisplayCaloriesConsumed();
     this._DisplayCaloriesBurned();
+    this._DisplyCaloriesProgress();
   }
 
   AddMeal(meal) {
@@ -40,7 +41,15 @@ class CalorieTracker {
     document.getElementById("calories-limit").innerText = this._calorieLimit;
   }
   _DisplayTotalCalories() {
-    document.getElementById("calories-total").innerText = this._totalCalories;
+    const div = document.getElementById("calories-total");
+    div.innerText = this._totalCalories;
+    if (this._totalCalories > this._calorieLimit) {
+      div.parentElement.parentElement.classList.remove("bg-primary");
+      div.parentElement.parentElement.classList.add("bg-danger");
+    } else {
+      div.parentElement.parentElement.classList.remove("bg-danger");
+      div.parentElement.parentElement.classList.add("bg-primary");
+    }
   }
 
   _DisplayCaloriesConsumed() {
@@ -66,7 +75,27 @@ class CalorieTracker {
 
   _DisplayCaloriesRemaining(consumed, burned) {
     const div = document.getElementById("calories-remaining");
-    div.innerText = this._calorieLimit - this._totalCalories;
+    const progBar = document.querySelector("#calorie-progress");
+    const remaining = this._calorieLimit - this._totalCalories;
+    div.innerText = remaining;
+    if (remaining <= 0) {
+      div.parentElement.parentElement.classList.remove("bg-light");
+      div.parentElement.parentElement.classList.add("bg-danger");
+      progBar.classList.remove("bg-success");
+      progBar.classList.add("bg-danger");
+    } else {
+      progBar.classList.remove("bg-danger");
+      progBar.classList.add("bg-green");
+      div.parentElement.parentElement.classList.remove("bg-danger");
+      div.parentElement.parentElement.classList.add("bg-light");
+    }
+  }
+
+  _DisplyCaloriesProgress() {
+    const progBar = document.querySelector("#calorie-progress");
+    const percetage = (this._totalCalories / this._calorieLimit) * 100;
+    const width = Math.min(percetage, 100);
+    progBar.style.width = `${width}%`;
   }
 
   _Render() {
@@ -77,6 +106,7 @@ class CalorieTracker {
       this._DisplayCaloriesBurned()
     );
     this._DisplayTotalCalories();
+    this._DisplyCaloriesProgress();
   }
 }
 
@@ -107,7 +137,7 @@ class Workout {
 }
 
 const tracker = new CalorieTracker();
-const meal = new Meal("breakfast", 400);
+const meal = new Meal("breakfast", 500);
 const workout = new Workout("run", 320);
 tracker.AddWorkout(workout);
 tracker.AddMeal(meal);
